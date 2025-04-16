@@ -9,7 +9,6 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Service;
 
 import com.banew.cinema_server.backend.dto.LoginResponseDto;
-import com.banew.cinema_server.backend.entities.CinemaUser;
 
 @Service
 public class AuthorizationService {

@@ -1,8 +1,8 @@
 package com.banew.cinema_server.backend.services;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
@@ -24,18 +24,25 @@ public class FilmService {
     private HallRepo hallRepo;
     private ViewSessionRepo viewSessionRepo;
 
-    public void saveFilm(Set<Film> films) {
+    public List<Film> saveFilm(List<Film> films) {
         filmRepo.saveAll(films);
+        return films;
     }
 
     public List<Film> getFilmsWithSessions() {
         return filmRepo.findBySessionsIsNotEmpty();
     }
 
+    public List<Film> getAll() {
+        List<Film> list = new ArrayList<>();
+        filmRepo.findAll().forEach(list::add);
+        return list;
+    }
+
     public ViewSession createSession(SessionCreationDto data) throws BadRequestException {
         var session = new ViewSession();
         Hall hall = hallRepo.findById(data.getHall_id()).orElseThrow(() -> new BadRequestException("Hall with " + data.getHall_id() + " is not exist!"));
-        Film film = filmRepo.findById(data.getHall_id()).orElseThrow(() -> new BadRequestException("Film with " + data.getFilm_id() + " is not exist!"));
+        Film film = filmRepo.findById(data.getFilm_id()).orElseThrow(() -> new BadRequestException("Film with " + data.getFilm_id() + " is not exist!"));
 
         session.setFilm(film);
         session.setHall_data(hall);
@@ -46,6 +53,17 @@ public class FilmService {
         viewSessionRepo.save(session);
 
         return session;
+    }
+
+    public Hall saveHall(Hall hall) {
+        hallRepo.save(hall);
+        return hall;
+    }
+
+    public List<Hall> getAllHalls() {
+        List<Hall> list = new ArrayList<>();
+        hallRepo.findAll().forEach(list::add);
+        return list;
     }
 
     public List<ViewSession> getSessionsByFilmId(Long film_id) throws BadRequestException {
