@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "secret.decoder_key",
+    "type": "java.lang.String",
+    "description": "TOP-SIKRET"
+  },
+  {
+    "name": "google.issure_uri",
+    "type": "java.lang.String",
+    "description": "A description for 'google.issure_uri'"
+  },
+  {
+    "name": "google.client_id",
+    "type": "java.lang.String",
+    "description": "A description for 'google.client_id'"
+  }
+]}

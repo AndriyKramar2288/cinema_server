@@ -1,0 +1,27 @@
+package com.banew.cinema_server;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+
+import com.banew.cinema_server.backend.dto.LoginResponseDto;
+import com.banew.cinema_server.backend.entities.CinemaUser;
+import com.banew.cinema_server.backend.services.AuthorizationService;
+
+@SpringBootTest
+@Disabled
+public class GoogleAuthorizationTest {
+    @Autowired
+    AuthorizationService authorizationService;
+
+    @Test
+    @Rollback
+    public void checkCreatingUser() {
+        String token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImMzN2RhNzVjOWZiZTE4YzJjZTkxMjViOWFhMWYzMDBkY2IzMWU4ZDkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI2ODc1NzkyNDM3NjItc2NiNHNtMGRkcWZvOXFwbDZnMTdkcmE2NDhnNWppcHUuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI2ODc1NzkyNDM3NjItc2NiNHNtMGRkcWZvOXFwbDZnMTdkcmE2NDhnNWppcHUuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDIzNzAxNzAyNTcxMzQyNTY0MTciLCJlbWFpbCI6ImFuZHJpeWtyYW1hcjQ2NUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmJmIjoxNzQ0NzMzNjc4LCJuYW1lIjoiTXJCQW5kcml5IiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0lMMEIxOUxkMEVwcnVhWmxwc3FMbmRsbUVhRVJiOVJhM0VaNEgwMTl2R3RMMGFvTHF3PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6Ik1yQkFuZHJpeSIsImlhdCI6MTc0NDczMzk3OCwiZXhwIjoxNzQ0NzM3NTc4LCJqdGkiOiJjMTEyZDUzOWNhYjhhZGQ4Nzc0YWNjYWE5YzdmMGQ2YzJlM2NjMDk1In0.i636GRGVs7KaRCgZr5eN_hV4q0N1V9a0U8W8y1jG_0Afeyf4GC60h5cdQ1x5NxwpPevT5w1N6D9MLBz7Foc-B1iCoKjr_Pl79r-8rGL2bkAVM2S9rHw_p9fQOeSV5cBSelZPrFec_9EHyu0O3ihY2psijFwJtGi-wOLhqejMunPKawAPDcI-EQierRw5-Z1NROzhTiacEQ_iykgo3NXvhmzJ19tf_xfRNED4lGOOb2AkziPgqVPH5uOC_lCaCukiLdxhgalwnR27y3j042HE8zHSfsaZAEAX40LyBJZFLc1XT8J0SzXsXJlWiZ7nFusW87vdrVS4v5uAEVRDhAy3pQ";
+
+        LoginResponseDto loginResponseDto = authorizationService.resolveGoogleCredential(token);
+        System.out.println(loginResponseDto);
+    }
+}
