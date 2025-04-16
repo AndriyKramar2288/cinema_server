@@ -1,5 +1,6 @@
 package com.banew.cinema_server.backend.configs;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.crypto.SecretKey;
@@ -16,8 +17,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import com.banew.cinema_server.backend.services.CinemaUserService;
 
@@ -31,20 +30,6 @@ public class SecurityConfig {
     CinemaUserService cinemaUserService;
 
     @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // якщо відправляєш куки або заголовки типу Authorization
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-
-        return new CorsFilter(source);
-    }
-
-    @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
         .authorizeHttpRequests(req -> req
@@ -53,6 +38,14 @@ public class SecurityConfig {
             .anyRequest().permitAll()
         )
         .csrf(c -> c.disable())
+        .cors(cors -> cors.configurationSource(request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.setAllowedOrigins(List.of("http://localhost:3000"));
+            config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+            config.setAllowCredentials(true);
+            return config;
+        }))
         .sessionManagement(mng -> mng.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(cinemaUserService.myJwtAuthenticationConverter())))
         .build();

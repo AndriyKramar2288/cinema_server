@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 
 import com.banew.cinema_server.backend.dto.LoginResponseDto;
-import com.banew.cinema_server.backend.entities.CinemaUser;
 import com.banew.cinema_server.backend.services.AuthorizationService;
 
 @SpringBootTest

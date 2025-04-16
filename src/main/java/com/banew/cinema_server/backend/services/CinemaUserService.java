@@ -8,7 +8,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +20,6 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class CinemaUserService {
-    private final PasswordEncoder passwordEncoder;
     private final CinemaUserRepo userRepository;
     private final JwtService jwtService;
 

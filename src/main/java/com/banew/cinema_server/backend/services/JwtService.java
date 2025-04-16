@@ -18,6 +18,9 @@ public class JwtService {
     @Value("${secret.decoder_key}")
     private String key;
 
+    @Value("${token_lifetime}")
+    private Long days_life_token;
+
     @Value("${spring.application.name}")
     private String applicationName;
 
@@ -28,7 +31,7 @@ public class JwtService {
         .withSubject(Optional.ofNullable(user.getId()).orElseThrow(() -> new BadCredentialsException("Cannot generate JWT without user id!")).toString())
         .withIssuer(applicationName)
         .withIssuedAt(new Date())
-        .withExpiresAt(Date.from(LocalDateTime.now().plusHours(5).atZone(ZoneId.systemDefault()).toInstant()))
+        .withExpiresAt(Date.from(LocalDateTime.now().plusDays(days_life_token).atZone(ZoneId.systemDefault()).toInstant()))
         .withArrayClaim("role", user.getRoles().toArray(new String[0]))
         .sign(algorithm);
     }
