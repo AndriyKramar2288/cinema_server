@@ -1,10 +1,12 @@
 package com.banew.cinema_server.backend.entities;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -27,6 +29,6 @@ public class ViewSession {
     private Integer price_per_sit;
     @ManyToOne(optional = false)
     private Hall hall_data;
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
-    private Set<Booking> bookings;
+    @OneToMany(mappedBy = "viewSession", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Booking> bookings = new ArrayList<>();
 }

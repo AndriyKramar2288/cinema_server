@@ -7,12 +7,15 @@ import java.util.List;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
+import com.banew.cinema_server.backend.dto.BookingCreationDTO;
 import com.banew.cinema_server.backend.dto.SessionCreationDto;
 import com.banew.cinema_server.backend.entities.Booking;
+import com.banew.cinema_server.backend.entities.CinemaUser;
 import com.banew.cinema_server.backend.entities.Film;
 import com.banew.cinema_server.backend.entities.Hall;
 import com.banew.cinema_server.backend.entities.ViewSession;
 import com.banew.cinema_server.backend.repositories.BookingRepo;
+import com.banew.cinema_server.backend.repositories.CinemaUserRepo;
 import com.banew.cinema_server.backend.repositories.FilmRepo;
 import com.banew.cinema_server.backend.repositories.HallRepo;
 import com.banew.cinema_server.backend.repositories.ViewSessionRepo;
@@ -26,6 +29,7 @@ public class FilmService {
     private HallRepo hallRepo;
     private ViewSessionRepo viewSessionRepo;
     private BookingRepo bookingRepo;
+    private CinemaUserRepo cinemaUserRepo;
 
     private static final Long PREPARE_TIME = 10L;
     private static final Long MIN_BOOKING = 20L;
@@ -112,7 +116,27 @@ public class FilmService {
         return viewSessionRepo.findByFilm(film);
     }
 
-    public List<Booking> saveBookings(List<Booking> bookings) {
+    public List<Booking> saveBookings(List<BookingCreationDTO> bookingDtos) throws BadRequestException {
+        List<Booking> bookings = new ArrayList<>();
+        
+        for (BookingCreationDTO dto : bookingDtos) {
+            Booking ret = new Booking();
+            ret.setCinemaViewer(dto.getCinemaViewer());
+            ret.setSit(dto.getSit());
+
+            if (dto.getUser_id() != null) {
+                CinemaUser user = cinemaUserRepo.findById(dto.getUser_id()).orElseThrow(
+                    () -> new BadRequestException("User with " + dto.getUser_id() + " is not exist!"));
+                ret.setCinemaUser(user);
+            }
+
+            ViewSession viewSession = viewSessionRepo.findById(dto.getSession_id()).orElseThrow(
+                () -> new BadRequestException("Session with " + dto.getSession_id() + " is not exist!"));
+
+            ret.setViewSession(viewSession);
+            bookings.add(ret);
+        }
+
         bookingRepo.saveAll(bookings);
         return bookings;
     }

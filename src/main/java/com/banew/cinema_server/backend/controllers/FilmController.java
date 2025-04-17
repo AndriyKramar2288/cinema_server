@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.banew.cinema_server.backend.dto.BookingCreationDTO;
 import com.banew.cinema_server.backend.dto.SessionCreationDto;
 import com.banew.cinema_server.backend.dto.SingleStringResponse;
 import com.banew.cinema_server.backend.entities.Booking;
@@ -98,13 +99,13 @@ public class FilmController {
     @PostMapping("/")
     @ResponseStatus(code = HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public List<Film> createFilms(@RequestBody @Valid List<Film> films)  throws BadRequestException {
+    public List<Film> createFilms(@RequestBody @Valid List<Film> films) throws BadRequestException {
         return filmService.saveFilm(films);
     }
 
     @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping("/booking/")
-    public List<Booking> getCurrentBookings(@RequestBody @Valid List<Booking> bookings) {
+    public List<Booking> getCurrentBookings(@RequestBody @Valid List<BookingCreationDTO> bookings) throws BadRequestException {
         return filmService.saveBookings(bookings);
     }
     

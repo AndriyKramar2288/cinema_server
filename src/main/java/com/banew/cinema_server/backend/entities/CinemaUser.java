@@ -33,9 +33,7 @@ public class CinemaUser {
 
     private String photoSrc;
     private Set<String> roles;
-    @JsonIgnore
-    @OneToMany(mappedBy = "cinemaUser", fetch = FetchType.EAGER)
-    private List<Booking> bookings;
+    
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream().map((e) -> new SimpleGrantedAuthority("ROLE_" + e)).toList();

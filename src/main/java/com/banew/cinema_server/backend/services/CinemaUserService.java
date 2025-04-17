@@ -62,10 +62,6 @@ public class CinemaUserService {
         userRepository.delete(user);
     }
 
-    public List<Booking> getBookingsByUser(CinemaUser cinemaUser) {
-        return bookingRepo.findByCinemaUser(cinemaUser);
-    }
-
     public LoginResponseDto processJwt(Jwt resultJwt) {
         String email = resultJwt.getClaim("email");
         CinemaUser cinemaUser = getUserByEmail(email).orElseGet(() -> {
@@ -88,5 +84,10 @@ public class CinemaUserService {
         });
 
         return new LoginResponseDto(cinemaUser, jwtService.encodeJwt(cinemaUser));
+    }
+
+
+    public List<Booking> getBookingsByUser(CinemaUser cinemaUser) {
+        return bookingRepo.findByCinemaUser(cinemaUser);
     }
 }
