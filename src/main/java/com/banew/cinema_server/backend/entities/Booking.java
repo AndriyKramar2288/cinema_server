@@ -2,6 +2,8 @@ package com.banew.cinema_server.backend.entities;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,7 +21,11 @@ public class Booking {
     private Long id;
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "session_id")
+    @JsonIgnore
     private ViewSession viewSession;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private CinemaUser cinemaUser;
     private LocalDateTime bookingTime = LocalDateTime.now();
     @OneToOne
     @JoinColumn(name = "viewer_id", nullable = false)

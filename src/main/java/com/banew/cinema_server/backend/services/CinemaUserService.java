@@ -1,5 +1,6 @@
 package com.banew.cinema_server.backend.services;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -12,7 +13,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import com.banew.cinema_server.backend.dto.LoginResponseDto;
+import com.banew.cinema_server.backend.entities.Booking;
 import com.banew.cinema_server.backend.entities.CinemaUser;
+import com.banew.cinema_server.backend.repositories.BookingRepo;
 import com.banew.cinema_server.backend.repositories.CinemaUserRepo;
 
 import lombok.AllArgsConstructor;
@@ -22,9 +25,11 @@ import lombok.AllArgsConstructor;
 public class CinemaUserService {
     private final CinemaUserRepo userRepository;
     private final JwtService jwtService;
+    private final BookingRepo bookingRepo;
+    private final UserServiceProperties userServiceProperties;
 
-    public Optional<CinemaUser> getUserByUsername(String username) {
-        List<CinemaUser> users = userRepository.findByUsername(username);
+    public Optional<CinemaUser> getUserByEmail(String email) {
+        List<CinemaUser> users = userRepository.findByEmail(email);
         if (users.size() != 1) {
             return Optional.empty();
         }
@@ -57,19 +62,28 @@ public class CinemaUserService {
         userRepository.delete(user);
     }
 
+    public List<Booking> getBookingsByUser(CinemaUser cinemaUser) {
+        return bookingRepo.findByCinemaUser(cinemaUser);
+    }
 
     public LoginResponseDto processJwt(Jwt resultJwt) {
-        String username = resultJwt.getClaim("name");
-        CinemaUser cinemaUser = getUserByUsername(username).orElseGet(() -> {
+        String email = resultJwt.getClaim("email");
+        CinemaUser cinemaUser = getUserByEmail(email).orElseGet(() -> {
+            Set<String> roles = new HashSet<>();
+            roles.add("USER");
+
+            if (userServiceProperties.getAdminEmails().contains(resultJwt.getClaim("email"))) {
+                roles.add("ADMIN");
+            }
+
             CinemaUser user = CinemaUser.builder()
             .email(resultJwt.getClaim("email"))
             .username(resultJwt.getClaim("name"))
             .photoSrc(resultJwt.getClaim("picture"))
-            .roles(Set.of("USER"))
+            .roles(roles)
             .build();
 
             this.save(user);
-
             return user;
         });
 

@@ -3,6 +3,8 @@ package com.banew.cinema_server.backend.entities;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,6 +19,7 @@ public class ViewSession {
     @Id
     @GeneratedValue
     private Long id;
+    @JsonIgnore
     @ManyToOne(optional = false)
     private Film film;
     private LocalDateTime date;

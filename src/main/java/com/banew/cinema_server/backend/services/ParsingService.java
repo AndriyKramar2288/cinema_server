@@ -1,7 +1,9 @@
 package com.banew.cinema_server.backend.services;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.jsoup.Jsoup;
@@ -92,7 +94,7 @@ public class ParsingService {
             }
             
             // Extract countries
-            Set<String> countries = new HashSet<>();
+            List<String> countries = new ArrayList<>();
             Elements countryElements = filmPage.select("div.fi-item:contains(Країна) div.fi-desc a");
             for (Element country : countryElements) {
                 countries.add(country.text());
@@ -100,7 +102,7 @@ public class ParsingService {
             film.setCountries(countries);
             
             // Extract genres
-            Set<String> genres = new HashSet<>();
+            List<String> genres = new ArrayList<>();
             Elements genreElements = filmPage.select("div.fi-item:contains(Жанр) div.fi-desc a");
             for (Element genre : genreElements) {
                 genres.add(genre.text());
@@ -116,7 +118,7 @@ public class ParsingService {
             film.setSrc_poster(posterUrl);
             
             // Extract photo URLs (if available)
-            Set<String> photoUrls = new HashSet<>();
+            List<String> photoUrls = new ArrayList<>();
             Elements photoElements = filmPage.select("div.film-gallery a");
             for (Element photo : photoElements) {
                 photoUrls.add(photo.attr("href"));
@@ -124,12 +126,11 @@ public class ParsingService {
             film.setSrc_photos(photoUrls);
             
             // Extract actors
-            Set<Actor> actors = new HashSet<>();
+            List<Actor> actors = new ArrayList<>();
             Elements actorElements = filmPage.select("div.fi-item:contains(Актори) div.fi-desc a");
             for (Element actorElement : actorElements) {
-                Actor actor = Actor.builder()
-                        .fullname(actorElement.text())
-                        .build();
+                Actor actor = new Actor();
+                actor.setFullname(actorElement.text());
                 actors.add(actor);
             }
             film.setActors(actors);
@@ -147,7 +148,7 @@ public class ParsingService {
             film.setAge_limit(ageLimit);
             
             // Extract ratings
-            Set<Rate> ratings = new HashSet<>();
+            List<Rate> ratings = new ArrayList<>();
             
             // IMDb rating
             Element imdbElement = filmPage.select("div.fi-item:contains(imdb) div.fi-desc").first();
@@ -156,10 +157,9 @@ public class ParsingService {
                 if (!imdbRating.isEmpty()) {
                     String[] ratingParts = imdbRating.split("/");
                     if (ratingParts.length > 0) {
-                        Rate imdb = Rate.builder()
-                                .name("IMDb")
-                                .rate(ratingParts[0])
-                                .build();
+                        Rate imdb = new Rate();
+                        imdb.setName("IMDb");
+                        imdb.setRate(ratingParts[0]);
                         ratings.add(imdb);
                     }
                 }

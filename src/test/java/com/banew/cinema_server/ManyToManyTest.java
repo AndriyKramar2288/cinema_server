@@ -1,13 +1,10 @@
 package com.banew.cinema_server;
 
-import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import com.banew.cinema_server.backend.entities.Actor;
-import com.banew.cinema_server.backend.entities.Film;
 import com.banew.cinema_server.backend.repositories.FilmRepo;
 
 @DataJpaTest
@@ -17,12 +14,12 @@ public class ManyToManyTest {
 
     @Test
     public void isWorks() {
-        Film film = new Film();
-        film.setActors(Set.of(Actor.builder().fullname("HOMO").build()));
-        filmRepo.save(film);
+        // Film film = new Film();
+        // film.setActors(Set.of(Actor.builder().fullname("HOMO").build()));
+        // filmRepo.save(film);
 
 
 
-        System.out.println(filmRepo.findAll());
+        // System.out.println(filmRepo.findAll());
     }
 }

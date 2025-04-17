@@ -29,6 +29,14 @@ public class FilmService {
         return films;
     }
 
+    public void deleteFilmById(Long id) {
+        filmRepo.deleteById(id);
+    }
+
+    public void deleteHallById(Long id) {
+        hallRepo.deleteById(id);
+    }
+
     public List<Film> getFilmsWithSessions() {
         return filmRepo.findBySessionsIsNotEmpty();
     }

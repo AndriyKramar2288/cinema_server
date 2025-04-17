@@ -18,5 +18,10 @@
     "name": "token_lifetime",
     "type": "java.lang.Long",
     "description": "A description for 'token_lifetime'"
+  },
+  {
+    "name": "usr-service.admin-emails",
+    "type": "java.util.List",
+    "description": "A description for 'usr-service.admin-emails'"
   }
 ]}

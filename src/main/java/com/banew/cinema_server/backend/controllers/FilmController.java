@@ -19,7 +19,9 @@ import java.util.List;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +40,13 @@ public class FilmController {
     @PreAuthorize("hasRole('ADMIN')")
     public List<Film> getAll() {
         return filmService.getAll();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity delFilmById(@PathVariable Long id) {
+        filmService.deleteFilmById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/with_sessions")
@@ -67,6 +76,13 @@ public class FilmController {
     @PreAuthorize("hasRole('ADMIN')")
     public Hall createHall(@RequestBody @Valid Hall hall)  throws BadRequestException {
         return filmService.saveHall(hall);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/hall/{id}")
+    public ResponseEntity delHallById(@PathVariable Long id) {
+        filmService.deleteHallById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/")

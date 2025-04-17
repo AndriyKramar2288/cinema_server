@@ -2,10 +2,11 @@ package com.banew.cinema_server;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,7 +22,6 @@ import com.banew.cinema_server.backend.dto.SessionCreationDto;
 import com.banew.cinema_server.backend.entities.CinemaUser;
 import com.banew.cinema_server.backend.entities.Film;
 import com.banew.cinema_server.backend.entities.Hall;
-import com.banew.cinema_server.backend.entities.ViewSession;
 import com.banew.cinema_server.backend.repositories.CinemaUserRepo;
 import com.banew.cinema_server.backend.services.FilmService;
 import com.banew.cinema_server.backend.services.JwtService;
@@ -42,11 +42,10 @@ public class FilmControllerTest {
 	private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private String token;
 
-    @Test
-    @Rollback
-    @Transactional
-    public void testUserStory() throws Exception {
+    @BeforeEach
+    public void prepare() {
         objectMapper.registerModule(new JavaTimeModule());
 
         CinemaUser fakeAdmin = CinemaUser.builder()
@@ -56,13 +55,27 @@ public class FilmControllerTest {
         .build();
 
         cinemaUserRepo.save(fakeAdmin);
+        token = jwtService.encodeJwt(fakeAdmin);
+    }
 
-        String token = jwtService.encodeJwt(fakeAdmin);
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/").header("Authorization", "Bearer " + token))
-        .andExpect(MockMvcResultMatchers.status().isOk());
+    @Test
+    @Rollback
+    @Transactional
+    public void testUserStory() throws Exception {
+        checkIfTokenValid();
+        hallChecking();
+        filmChecking();
+    }
 
-        // hall
+    @AfterEach
+    public void delAdmin() {
+        List<CinemaUser> admins = cinemaUserRepo.findByEmail("admin");
+        if (admins.size() > 0) {
+            cinemaUserRepo.deleteAll(admins);
+        }
+    }
 
+    private void hallChecking() throws Exception {
         Hall hall = new Hall();
         hall.setName("aboba");
 
@@ -75,16 +88,16 @@ public class FilmControllerTest {
         .andReturn();
 
         assertTrue(mvcResult.getResponse().getContentAsString().length() > 5);
+    }
 
-        // film
-
+    private void filmChecking() throws Exception {
         Film film = new Film();
         mockMvc.perform(MockMvcRequestBuilders.post("/films/").header("Authorization", "Bearer " + token)
         .content(objectMapper.writeValueAsString(List.of(film))).contentType("application/json"))
         .andExpect(MockMvcResultMatchers.status().isCreated());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/films/session/").header("Authorization", "Bearer " + token)
-        .content(objectMapper.writeValueAsString(new ViewSession())).contentType("application/json"))
+        .content(objectMapper.writeValueAsString(new SessionCreationDto())).contentType("application/json"))
         .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         SessionCreationDto viewSession = new SessionCreationDto();
@@ -97,5 +110,10 @@ public class FilmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/films/session/").header("Authorization", "Bearer " + token)
         .content(objectMapper.writeValueAsString(viewSession)).contentType("application/json"))
         .andExpect(MockMvcResultMatchers.status().isCreated());
+    }
+
+    private void checkIfTokenValid() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/").header("Authorization", "Bearer " + token))
+        .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
