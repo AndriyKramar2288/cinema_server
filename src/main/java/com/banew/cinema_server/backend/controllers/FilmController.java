@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.banew.cinema_server.backend.dto.SessionCreationDto;
 import com.banew.cinema_server.backend.dto.SingleStringResponse;
+import com.banew.cinema_server.backend.entities.CinemaUser;
 import com.banew.cinema_server.backend.entities.Film;
 import com.banew.cinema_server.backend.entities.Hall;
 import com.banew.cinema_server.backend.entities.ViewSession;
@@ -21,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
+    private final static String VALIDATION_ERROR_MESSAGE = "Введені дані некоректні або відсутні!";
+
     @Autowired
     private FilmService filmService;
 
@@ -66,6 +71,13 @@ public class FilmController {
         return filmService.createSession(sessionCreationDto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/session/{id}")
+    public ResponseEntity delSessionById(@PathVariable Long id) {
+        filmService.deleteSessionById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     @GetMapping("/hall/")
     public List<Hall> getHalls() {
         return filmService.getAllHalls();
@@ -91,7 +103,12 @@ public class FilmController {
     public List<Film> createFilms(@RequestBody @Valid List<Film> films)  throws BadRequestException {
         return filmService.saveFilm(films);
     }
-    
+
+    // @ResponseStatus(code = HttpStatus.CREATED)
+    // @PostMapping("/booking/")
+    // public List<Booking> getCurrentBookings(@RequestBody @Valid List<Booking> bookings) {
+    //     return filmService.saveBookings(bookings);
+    // }
     
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler
@@ -101,7 +118,7 @@ public class FilmController {
 
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler
-    public SingleStringResponse badRequest(ValidationException ex) {
-        return new SingleStringResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public SingleStringResponse badRequest(MethodArgumentNotValidException ex) {
+        return new SingleStringResponse(VALIDATION_ERROR_MESSAGE, HttpStatus.BAD_REQUEST);
     }
 }

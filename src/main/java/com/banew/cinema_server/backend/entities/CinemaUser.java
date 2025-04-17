@@ -7,6 +7,8 @@ import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -31,10 +33,10 @@ public class CinemaUser {
 
     private String photoSrc;
     private Set<String> roles;
- 
-    @OneToMany(mappedBy = "cinemaUser", fetch = FetchType.EAGER)
-    private List<Booking> bookings;
-
+    // @JsonIgnore
+    // @OneToMany(mappedBy = "cinemaUser", fetch = FetchType.EAGER)
+    // private List<Booking> bookings;
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream().map((e) -> new SimpleGrantedAuthority("ROLE_" + e)).toList();
     }

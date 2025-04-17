@@ -27,7 +27,6 @@ public class ViewSession {
     private Integer price_per_sit;
     @ManyToOne(optional = false)
     private Hall hall_data;
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
-    private Set<Booking> bookings;
-
+    // @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
+    // private Set<Booking> bookings;
 }

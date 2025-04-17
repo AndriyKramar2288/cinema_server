@@ -30,11 +30,11 @@ public class Film {
     @NotBlank
     private String src_poster;
     private List<String> src_photos;
-    @ManyToMany(targetEntity = Actor.class, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Actor> actors;
     private String duration;
     private String voice_acting;
-    @ManyToMany(targetEntity = Rate.class, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Rate> rating;
     private String age_limit;
     private String about;

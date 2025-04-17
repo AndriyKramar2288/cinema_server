@@ -15,6 +15,7 @@ import com.banew.cinema_server.backend.repositories.FilmRepo;
 import com.banew.cinema_server.backend.repositories.HallRepo;
 import com.banew.cinema_server.backend.repositories.ViewSessionRepo;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -23,6 +24,11 @@ public class FilmService {
     private FilmRepo filmRepo;
     private HallRepo hallRepo;
     private ViewSessionRepo viewSessionRepo;
+    // private BookingRepo bookingRepo;
+
+    private static final Long PREPARE_TIME = 10L;
+    private static final Long MIN_BOOKING = 20L;
+    private static final String TIME_CURRENTLY_UNTAKEBLE = "Вказаний час сеансу у вказаній залі вже зайнятий!";
 
     public List<Film> saveFilm(List<Film> films) {
         filmRepo.saveAll(films);
@@ -37,8 +43,21 @@ public class FilmService {
         hallRepo.deleteById(id);
     }
 
+    public void deleteSessionById(Long id) {
+        viewSessionRepo.deleteById(id);
+    }
+
     public List<Film> getFilmsWithSessions() {
-        return filmRepo.findBySessionsIsNotEmpty();
+        List<Film> result = filmRepo.findBySessionsIsNotEmpty();
+
+        LocalDateTime minTimeFilm = LocalDateTime.now().plusMinutes(MIN_BOOKING);
+
+        return result.stream().filter(each -> {
+            Long notBeforeNowSessionsFilmSize = each.getSessions().stream()
+                .filter(session -> session.getDate().isAfter(minTimeFilm)).count();
+            
+            return notBeforeNowSessionsFilmSize > 0;
+        }).toList();
     }
 
     public List<Film> getAll() {
@@ -58,6 +77,19 @@ public class FilmService {
         session.setPrice_per_sit(data.getPrice_per_sit());
         session.setDate(LocalDateTime.parse(data.getDate()));
 
+        for(ViewSession eachSession : viewSessionRepo.findAll()) {
+            if (!eachSession.getHall_data().equals(session.getHall_data())) {
+                continue;
+            }
+
+            if (eachSession.getDate().plusMinutes(Long.parseLong(eachSession.getFilm().getDuration() + PREPARE_TIME)).isBefore(session.getDate()) ||
+                session.getDate().plusMinutes(Long.parseLong(film.getDuration() + PREPARE_TIME)).isBefore(eachSession.getDate())) {
+                    continue;
+            }
+
+            throw new BadRequestException(TIME_CURRENTLY_UNTAKEBLE);
+        }
+
         viewSessionRepo.save(session);
 
         return session;
@@ -76,7 +108,11 @@ public class FilmService {
 
     public List<ViewSession> getSessionsByFilmId(Long film_id) throws BadRequestException {
         Film film = filmRepo.findById(film_id).orElseThrow(() -> new BadRequestException("Film with " + film_id + " is not exist!"));
-
         return viewSessionRepo.findByFilm(film);
     }
+
+    // public List<Booking> saveBookings(List<Booking> bookings) {
+    //     bookingRepo.saveAll(bookings);
+    //     return bookings;
+    // }
 }

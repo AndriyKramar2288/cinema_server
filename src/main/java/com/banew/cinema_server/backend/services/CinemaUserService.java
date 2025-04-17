@@ -13,9 +13,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import com.banew.cinema_server.backend.dto.LoginResponseDto;
-import com.banew.cinema_server.backend.entities.Booking;
 import com.banew.cinema_server.backend.entities.CinemaUser;
-import com.banew.cinema_server.backend.repositories.BookingRepo;
 import com.banew.cinema_server.backend.repositories.CinemaUserRepo;
 
 import lombok.AllArgsConstructor;
@@ -25,7 +23,7 @@ import lombok.AllArgsConstructor;
 public class CinemaUserService {
     private final CinemaUserRepo userRepository;
     private final JwtService jwtService;
-    private final BookingRepo bookingRepo;
+    //private final BookingRepo bookingRepo;
     private final UserServiceProperties userServiceProperties;
 
     public Optional<CinemaUser> getUserByEmail(String email) {
@@ -62,9 +60,9 @@ public class CinemaUserService {
         userRepository.delete(user);
     }
 
-    public List<Booking> getBookingsByUser(CinemaUser cinemaUser) {
-        return bookingRepo.findByCinemaUser(cinemaUser);
-    }
+    // public List<Booking> getBookingsByUser(CinemaUser cinemaUser) {
+    //     return bookingRepo.findByCinemaUser(cinemaUser);
+    // }
 
     public LoginResponseDto processJwt(Jwt resultJwt) {
         String email = resultJwt.getClaim("email");
