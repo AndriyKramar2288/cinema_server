@@ -1,6 +1,6 @@
 package com.banew.cinema_server.backend.entities;
 
-import java.util.Set;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -25,5 +25,5 @@ public class Rate {
     private String rate;
     @JsonIgnore
     @ManyToMany(mappedBy = "rating")
-    private Set<Film> films;
+    private List<Film> films;
 }

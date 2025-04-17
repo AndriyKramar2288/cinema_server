@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import com.banew.cinema_server.backend.dto.BookingInfo;
 import com.banew.cinema_server.backend.dto.LoginResponseDto;
 import com.banew.cinema_server.backend.entities.Booking;
 import com.banew.cinema_server.backend.entities.CinemaUser;
@@ -87,7 +88,12 @@ public class CinemaUserService {
     }
 
 
-    public List<Booking> getBookingsByUser(CinemaUser cinemaUser) {
-        return bookingRepo.findByCinemaUser(cinemaUser);
+    public List<BookingInfo> getBookingsByUser(CinemaUser cinemaUser) {
+        return bookingRepo.findByCinemaUser(cinemaUser).stream()
+        .map(booking -> BookingInfo.builder()
+            .film(booking.getViewSession().getFilm())
+            .booking(booking)
+            .build()
+        ).toList();
     }
 }
