@@ -8,14 +8,15 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import com.banew.cinema_server.backend.dto.SessionCreationDto;
+import com.banew.cinema_server.backend.entities.Booking;
 import com.banew.cinema_server.backend.entities.Film;
 import com.banew.cinema_server.backend.entities.Hall;
 import com.banew.cinema_server.backend.entities.ViewSession;
+import com.banew.cinema_server.backend.repositories.BookingRepo;
 import com.banew.cinema_server.backend.repositories.FilmRepo;
 import com.banew.cinema_server.backend.repositories.HallRepo;
 import com.banew.cinema_server.backend.repositories.ViewSessionRepo;
 
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -24,7 +25,7 @@ public class FilmService {
     private FilmRepo filmRepo;
     private HallRepo hallRepo;
     private ViewSessionRepo viewSessionRepo;
-    // private BookingRepo bookingRepo;
+    private BookingRepo bookingRepo;
 
     private static final Long PREPARE_TIME = 10L;
     private static final Long MIN_BOOKING = 20L;
@@ -111,8 +112,8 @@ public class FilmService {
         return viewSessionRepo.findByFilm(film);
     }
 
-    // public List<Booking> saveBookings(List<Booking> bookings) {
-    //     bookingRepo.saveAll(bookings);
-    //     return bookings;
-    // }
+    public List<Booking> saveBookings(List<Booking> bookings) {
+        bookingRepo.saveAll(bookings);
+        return bookings;
+    }
 }

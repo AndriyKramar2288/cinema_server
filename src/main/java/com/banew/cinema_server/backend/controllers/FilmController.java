@@ -6,14 +6,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.banew.cinema_server.backend.dto.SessionCreationDto;
 import com.banew.cinema_server.backend.dto.SingleStringResponse;
-import com.banew.cinema_server.backend.entities.CinemaUser;
+import com.banew.cinema_server.backend.entities.Booking;
 import com.banew.cinema_server.backend.entities.Film;
 import com.banew.cinema_server.backend.entities.Hall;
 import com.banew.cinema_server.backend.entities.ViewSession;
 import com.banew.cinema_server.backend.services.FilmService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 
 import java.util.List;
 
@@ -22,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -104,11 +102,11 @@ public class FilmController {
         return filmService.saveFilm(films);
     }
 
-    // @ResponseStatus(code = HttpStatus.CREATED)
-    // @PostMapping("/booking/")
-    // public List<Booking> getCurrentBookings(@RequestBody @Valid List<Booking> bookings) {
-    //     return filmService.saveBookings(bookings);
-    // }
+    @ResponseStatus(code = HttpStatus.CREATED)
+    @PostMapping("/booking/")
+    public List<Booking> getCurrentBookings(@RequestBody @Valid List<Booking> bookings) {
+        return filmService.saveBookings(bookings);
+    }
     
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler
