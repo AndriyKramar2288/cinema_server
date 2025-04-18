@@ -3,7 +3,6 @@ package com.banew.cinema_server.backend.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.banew.cinema_server.backend.dto.BookingInfoDto;
 import com.banew.cinema_server.backend.dto.CinemaUserInfoDto;
 import com.banew.cinema_server.backend.dto.ViewSessionInfoDto;
 import com.banew.cinema_server.backend.entities.CinemaUser;

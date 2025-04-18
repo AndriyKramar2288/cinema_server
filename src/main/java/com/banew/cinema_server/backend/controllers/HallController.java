@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banew.cinema_server.backend.entities.Hall;
+import com.banew.cinema_server.backend.exceptions.BadRequestSendedException;
 import com.banew.cinema_server.backend.services.HallService;
 
 import jakarta.validation.Valid;
@@ -41,7 +42,7 @@ public class HallController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity delHallById(@PathVariable Long id) {
+    public ResponseEntity delHallById(@PathVariable Long id) throws BadRequestSendedException {
         hallService.deleteHallById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

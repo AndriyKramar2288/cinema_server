@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banew.cinema_server.backend.dto.FilmSimpleInfoDto;
+import com.banew.cinema_server.backend.exceptions.BadRequestSendedException;
 import com.banew.cinema_server.backend.services.FilmService;
 import com.banew.cinema_server.backend.services.SessionService;
 
@@ -48,7 +49,7 @@ public class FilmController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity delFilmById(@PathVariable Long id) {
+    public ResponseEntity delFilmById(@PathVariable Long id) throws BadRequestSendedException {
         filmService.deleteFilmById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

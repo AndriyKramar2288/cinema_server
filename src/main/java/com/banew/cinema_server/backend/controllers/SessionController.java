@@ -42,7 +42,7 @@ public class SessionController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity delSessionById(@PathVariable Long id) {
+    public ResponseEntity delSessionById(@PathVariable Long id) throws BadRequestSendedException {
         sessionService.deleteSessionById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

@@ -10,7 +10,6 @@ import com.banew.cinema_server.backend.dto.BookingCreationDto;
 import com.banew.cinema_server.backend.dto.BookingInfoDto;
 import com.banew.cinema_server.backend.entities.Booking;
 import com.banew.cinema_server.backend.entities.CinemaUser;
-import com.banew.cinema_server.backend.entities.CinemaViewer;
 import com.banew.cinema_server.backend.entities.ViewSession;
 import com.banew.cinema_server.backend.exceptions.BadRequestSendedException;
 import com.banew.cinema_server.backend.repositories.BookingRepo;

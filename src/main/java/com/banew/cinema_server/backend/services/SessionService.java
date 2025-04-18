@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,8 +37,12 @@ public class SessionService {
         return viewSessionRepo.findByFilm(film).stream().map(session -> ViewSessionInfoDto.fromViewSession(session)).toList();
     }
 
-    public void deleteSessionById(Long id) {
-        viewSessionRepo.deleteById(id);
+    public void deleteSessionById(Long id) throws BadRequestSendedException {
+        try {
+            viewSessionRepo.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestSendedException("Видалення не вдалось: надто багато залежностей!");
+        }
     }
 
     public List<ViewSession> getAll() {
