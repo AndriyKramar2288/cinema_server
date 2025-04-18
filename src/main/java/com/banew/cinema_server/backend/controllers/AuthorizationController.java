@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.banew.cinema_server.backend.dto.LoginRequestDto;
 import com.banew.cinema_server.backend.dto.LoginResponseDto;
 import com.banew.cinema_server.backend.dto.SingleStringResponse;
 import com.banew.cinema_server.backend.services.AuthorizationService;
@@ -19,8 +20,8 @@ public class AuthorizationController {
     AuthorizationService authorizationService;
 
     @PostMapping("/auth/google_id_token")
-    public LoginResponseDto resolveGoogleToken(@RequestBody String token) {
-        return authorizationService.resolveGoogleCredential(token);
+    public LoginResponseDto resolveGoogleToken(@RequestBody LoginRequestDto request) {
+        return authorizationService.resolveGoogleCredential(request.getToken());
     }
 
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)

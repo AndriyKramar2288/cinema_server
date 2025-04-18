@@ -10,4 +10,5 @@ import java.util.List;
 
 public interface BookingRepo extends CrudRepository<Booking, Long> {
     List<Booking> findByCinemaUser(CinemaUser cinemaUser);
+    boolean existsBySit(Long sit);
 }

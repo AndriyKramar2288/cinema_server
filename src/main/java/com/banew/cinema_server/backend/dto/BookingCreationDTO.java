@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class BookingCreationDTO {
+public class BookingCreationDto {
     @NotNull
     private Long session_id;
     private Long user_id;

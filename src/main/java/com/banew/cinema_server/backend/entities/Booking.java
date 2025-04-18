@@ -2,11 +2,8 @@ package com.banew.cinema_server.backend.entities;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -20,16 +17,16 @@ public class Booking {
     @Id
     @GeneratedValue
     private Long id;
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+
+    @ManyToOne(optional = false)
     private ViewSession viewSession;
     private LocalDateTime bookingTime = LocalDateTime.now();
-    @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cinemaUser_id")
     private CinemaUser cinemaUser;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cinemaViewer_id")
     private CinemaViewer cinemaViewer;
     @NotNull

@@ -11,10 +11,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.banew.cinema_server.backend.dto.BookingInfo;
+import com.banew.cinema_server.backend.dto.BookingInfoDto;
 import com.banew.cinema_server.backend.dto.LoginResponseDto;
-import com.banew.cinema_server.backend.entities.Booking;
+import com.banew.cinema_server.backend.dto.ViewSessionInfoDto;
 import com.banew.cinema_server.backend.entities.CinemaUser;
 import com.banew.cinema_server.backend.repositories.BookingRepo;
 import com.banew.cinema_server.backend.repositories.CinemaUserRepo;
@@ -84,16 +85,17 @@ public class CinemaUserService {
             return user;
         });
 
+        cinemaUser.setUsername(resultJwt.getClaim("name"));
+        cinemaUser.setPhotoSrc(resultJwt.getClaim("picture"));
+
         return new LoginResponseDto(cinemaUser, jwtService.encodeJwt(cinemaUser));
     }
 
-
-    public List<BookingInfo> getBookingsByUser(CinemaUser cinemaUser) {
+    @Transactional
+    public List<ViewSessionInfoDto> getBookingSessionsByUser(CinemaUser cinemaUser) {
         return bookingRepo.findByCinemaUser(cinemaUser).stream()
-        .map(booking -> BookingInfo.builder()
-            .film(booking.getViewSession().getFilm())
-            .booking(booking)
-            .build()
-        ).toList();
+        .map(booking -> ViewSessionInfoDto.fromViewSession(booking.getViewSession()))
+        .distinct()
+        .toList();
     }
 }

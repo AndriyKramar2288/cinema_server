@@ -3,8 +3,9 @@ package com.banew.cinema_server.backend.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.banew.cinema_server.backend.dto.BookingInfo;
-import com.banew.cinema_server.backend.entities.Booking;
+import com.banew.cinema_server.backend.dto.BookingInfoDto;
+import com.banew.cinema_server.backend.dto.CinemaUserInfoDto;
+import com.banew.cinema_server.backend.dto.ViewSessionInfoDto;
 import com.banew.cinema_server.backend.entities.CinemaUser;
 import com.banew.cinema_server.backend.services.CinemaUserService;
 
@@ -22,12 +23,12 @@ public class UserController {
     CinemaUserService cinemaUserService;
 
     @GetMapping("/")
-    public CinemaUser getCurrentProfile(@AuthenticationPrincipal CinemaUser cinemaUser) {
-        return cinemaUser;
+    public CinemaUserInfoDto getCurrentProfile(@AuthenticationPrincipal CinemaUser cinemaUser) {
+        return CinemaUserInfoDto.fromUser(cinemaUser);
     }
 
-    @GetMapping("/booking/")
-    public List<BookingInfo> getCurrentBookings(@AuthenticationPrincipal CinemaUser cinemaUser) {
-        return cinemaUserService.getBookingsByUser(cinemaUser);
+    @GetMapping("/session/")
+    public List<ViewSessionInfoDto> getUserBookingSessions(@AuthenticationPrincipal CinemaUser cinemaUser) {
+        return cinemaUserService.getBookingSessionsByUser(cinemaUser);
     }
 }
