@@ -49,7 +49,7 @@ public class ParsingService {
                 ExpectedConditions.presenceOfElementLocated(By.id("searchinput"))
             );
             
-            searchInput.sendKeys("Нікчемний я");
+            searchInput.sendKeys(request);
             searchInput.submit();
             
             wait.until(ExpectedConditions.presenceOfElementLocated(By.className("movie-item")));
@@ -95,7 +95,6 @@ public class ParsingService {
             if (photosContainer != null) {
                 photosContainer.children().forEach(child -> {
                     photos.add(child.attr("abs:href"));
-                    System.out.println(child.attr("abs:href"));
                 });
             }
             film.setSrc_photos(photos);
@@ -131,7 +130,7 @@ public class ParsingService {
             film.setDirector(director);
             
             // Extract poster URL
-            String posterUrl = filmPage.select("div.film-poster a img").attr("src");
+            String posterUrl = filmPage.select("div.film-poster a img").attr("abs:src");
             film.setSrc_poster(posterUrl);
             
             // Extract actors
@@ -172,8 +171,7 @@ public class ParsingService {
             // Handle exceptions
             e.printStackTrace();
         }
-        
-        System.err.println(film);
+
         return film;
     }
 
@@ -195,7 +193,7 @@ public class ParsingService {
                 if (filmPage.getElementsByClass("solototle").size() != 1) {
                     continue;
                 }
-                generateFilmInfoByFilmPage(filmPage);
+                result.add(generateFilmInfoByFilmPage(filmPage));
 
             } catch (IOException e) {
                 throw new BadRequestSendedException("Помилка парсингу!");
