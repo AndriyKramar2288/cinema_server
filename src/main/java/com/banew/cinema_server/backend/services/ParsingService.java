@@ -1,5 +1,8 @@
 package com.banew.cinema_server.backend.services;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,9 +23,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
 
-import com.banew.cinema_server.backend.entities.Actor;
-import com.banew.cinema_server.backend.entities.Film;
-import com.banew.cinema_server.backend.entities.Rate;
+import com.banew.cinema_server.backend.dto.FilmSimpleInfoDto;
+import com.banew.cinema_server.backend.exceptions.BadRequestSendedException;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 
@@ -60,12 +62,12 @@ public class ParsingService {
         return html;
     }
 
-    private Film generateFilmByFilmPage(Document filmPage) {
+    private FilmSimpleInfoDto generateFilmInfoByFilmPage(Document filmPage) {
         if (filmPage == null) {
             return null;
         }
         
-        Film film = new Film();
+        FilmSimpleInfoDto film = new FilmSimpleInfoDto();
         
         try {
             // Extract film title (ukrainian name)
@@ -80,9 +82,24 @@ public class ParsingService {
             }
             film.setUk_name(ukName);
             
-            // No english name directly visible in the provided HTML
-            // Could be implemented if available elsewhere on the page
-            
+            Element enNameSpan = filmPage.select("span[itemprop=alternateName]").first();
+            if (enNameSpan != null) {
+                Element enNameSpanA = enNameSpan.firstElementChild();
+                if (enNameSpanA != null) {
+                    film.setEn_name(enNameSpan.text());
+                }
+            }
+
+            List<String> photos = new ArrayList<>();
+            Element photosContainer = filmPage.getElementsByClass("screens-section").first();
+            if (photosContainer != null) {
+                photosContainer.children().forEach(child -> {
+                    photos.add(child.attr("abs:href"));
+                    System.out.println(child.attr("abs:href"));
+                });
+            }
+            film.setSrc_photos(photos);
+
             // Extract release year
             String yearText = filmPage.select("div.fi-item:contains(Рік виходу) div.fi-desc").text();
             if (!yearText.isEmpty()) {
@@ -117,21 +134,11 @@ public class ParsingService {
             String posterUrl = filmPage.select("div.film-poster a img").attr("src");
             film.setSrc_poster(posterUrl);
             
-            // Extract photo URLs (if available)
-            List<String> photoUrls = new ArrayList<>();
-            Elements photoElements = filmPage.select("div.film-gallery a");
-            for (Element photo : photoElements) {
-                photoUrls.add(photo.attr("href"));
-            }
-            film.setSrc_photos(photoUrls);
-            
             // Extract actors
-            List<Actor> actors = new ArrayList<>();
+            List<String> actors = new ArrayList<>();
             Elements actorElements = filmPage.select("div.fi-item:contains(Актори) div.fi-desc a");
             for (Element actorElement : actorElements) {
-                Actor actor = new Actor();
-                actor.setFullname(actorElement.text());
-                actors.add(actor);
+                actors.add(actorElement.text());
             }
             film.setActors(actors);
             
@@ -147,25 +154,12 @@ public class ParsingService {
             String ageLimit = filmPage.select("div.fi-item:contains(Вік. рейтинг) div.fi-desc").text();
             film.setAge_limit(ageLimit);
             
-            // Extract ratings
-            List<Rate> ratings = new ArrayList<>();
-            
-            // IMDb rating
-            Element imdbElement = filmPage.select("div.fi-item:contains(imdb) div.fi-desc").first();
-            if (imdbElement != null) {
-                String imdbRating = imdbElement.text();
-                if (!imdbRating.isEmpty()) {
-                    String[] ratingParts = imdbRating.split("/");
-                    if (ratingParts.length > 0) {
-                        Rate imdb = new Rate();
-                        imdb.setName("IMDb");
-                        imdb.setRate(ratingParts[0]);
-                        ratings.add(imdb);
-                    }
-                }
+
+            // IMDB
+            Element imdbBlock = filmPage.getElementsByAttributeValue("src", "/templates/uakino/images/imdb-mini.png").first();
+            if (imdbBlock != null) {
+                film.setImdb(imdbBlock.parent().parent().lastElementChild().text());
             }
-            
-            film.setRating(ratings);
             
             // Extract film description/about
             String about = filmPage.select("div.full-text[itemprop=description]").text();
@@ -179,32 +173,34 @@ public class ParsingService {
             e.printStackTrace();
         }
         
+        System.err.println(film);
         return film;
     }
 
-    public Set<Film> findFilmsByUAKino(String request) {
-        Set<Film> result = new HashSet<>();
+    public Set<FilmSimpleInfoDto> findFilmsByUAKino(String request) throws BadRequestSendedException {
+        Set<FilmSimpleInfoDto> result = new HashSet<>();
 
         Document siteWithFilmList = parseDynamicUAKinoSearch(request);
 
         if (siteWithFilmList == null) {
-            System.out.println("ABOBAAAAAAAAAA");
-            return Set.of();
+            throw new BadRequestSendedException("Помилка парсингу!");
         }
 
         Elements films_cards = siteWithFilmList.getElementsByClass("movie-item");
-        films_cards.forEach(card -> {
+        for (Element card : films_cards) {
             try {
                 Element link = card.getElementsByTag("a").first();
                 Document filmPage = Jsoup.connect(link.attr("href")).get();
                 
                 if (filmPage.getElementsByClass("solototle").size() != 1) {
-                    return;
+                    continue;
                 }
+                generateFilmInfoByFilmPage(filmPage);
 
-                result.add(generateFilmByFilmPage(filmPage));
-            } catch (Exception e) { }
-        });
+            } catch (IOException e) {
+                throw new BadRequestSendedException("Помилка парсингу!");
+            }
+        }
 
         return result;
     }

@@ -2,7 +2,6 @@ package com.banew.cinema_server.backend.entities;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -22,11 +21,11 @@ public class Booking {
     private ViewSession viewSession;
     private LocalDateTime bookingTime = LocalDateTime.now();
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "cinemaUser_id")
     private CinemaUser cinemaUser;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "cinemaViewer_id")
     private CinemaViewer cinemaViewer;
     @NotNull

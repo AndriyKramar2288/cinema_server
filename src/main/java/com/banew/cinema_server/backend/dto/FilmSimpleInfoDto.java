@@ -65,7 +65,12 @@ public class FilmSimpleInfoDto {
         .voice_acting(film.getVoice_acting())
         .imdb(film.getRating().stream()
             .filter(rate -> rate.getName().equals("imdb"))
-            .findFirst().orElseThrow()
+            .findFirst().orElseGet(() -> {
+                Rate rate = new Rate();
+                rate.setName("imdb");
+                rate.setRate("-");
+                return rate;
+            })
             .getRate())
         .age_limit(film.getAge_limit())
         .about(film.getAbout())

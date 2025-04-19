@@ -56,7 +56,7 @@ public class SessionController {
         .toList();
     }
 
-    @PreAuthorize("hasRole('WORKER')")
+    @PreAuthorize("hasRole('WORKER') or hasRole('ADMIN')")
     @GetMapping("/available_worker")
     public List<ViewSessionFullInfoDto> getAvailableSessionsFullInfo() {
         return sessionService.getFutureSessions()

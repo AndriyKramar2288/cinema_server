@@ -21,8 +21,13 @@ import lombok.AllArgsConstructor;
 public class BookingService {
     private CinemaUserService cinemaUserService;
     private SessionService sessionService;
-
     private BookingRepo bookingRepo;
+
+    public void deleteBookingById(Long id) throws BadRequestSendedException {
+        Booking booking = bookingRepo.findById(id)
+                .orElseThrow(() -> new BadRequestSendedException("Booking with " + id + " is not exist!"));
+        bookingRepo.delete(booking);
+    }
 
     @Transactional
     public List<BookingInfoDto> saveBookings(List<BookingCreationDto> bookingDtos) throws BadRequestSendedException {
