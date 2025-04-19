@@ -1,5 +1,6 @@
 package com.banew.cinema_server.backend.controllers;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banew.cinema_server.backend.dto.SessionCreationDto;
+import com.banew.cinema_server.backend.dto.ViewSessionFullInfoDto;
 import com.banew.cinema_server.backend.dto.ViewSessionInfoDto;
 import com.banew.cinema_server.backend.exceptions.BadRequestSendedException;
 import com.banew.cinema_server.backend.services.SessionService;
@@ -51,6 +53,16 @@ public class SessionController {
     public List<ViewSessionInfoDto> getAvailableSessions() {
         return sessionService.getAvailableSessions().stream()
         .map(session -> ViewSessionInfoDto.fromViewSession(session))
+        .toList();
+    }
+
+    @PreAuthorize("hasRole('WORKER')")
+    @GetMapping("/available_worker")
+    public List<ViewSessionFullInfoDto> getAvailableSessionsFullInfo() {
+        return sessionService.getFutureSessions()
+        .stream()
+        .sorted(Comparator.comparing(session -> session.getDate()))
+        .map(session -> ViewSessionFullInfoDto.fromViewSession(session))
         .toList();
     }
 }

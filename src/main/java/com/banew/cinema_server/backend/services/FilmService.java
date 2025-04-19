@@ -31,7 +31,7 @@ public class FilmService {
         try {
             filmRepo.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new BadRequestSendedException("Видалення не вдалось: надто багато залежностей!");
+            throw new BadRequestSendedException("Видалення не вдалось: до цього фільму вже існують деякі сеанси!");
         }
     }
 

@@ -23,5 +23,10 @@
     "name": "usr-service.admin-emails",
     "type": "java.util.List",
     "description": "A description for 'usr-service.admin-emails'"
+  },
+  {
+    "name": "usr-service.workerEmails",
+    "type": "java.util.List",
+    "description": "A description for 'usr-service.workerEmails'"
   }
 ]}

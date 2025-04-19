@@ -1,5 +1,6 @@
 package com.banew.cinema_server.backend.services;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -13,10 +14,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.banew.cinema_server.backend.dto.BookingInfoDto;
 import com.banew.cinema_server.backend.dto.LoginResponseDto;
-import com.banew.cinema_server.backend.dto.ViewSessionInfoDto;
+import com.banew.cinema_server.backend.dto.ViewSessionFullInfoDto;
 import com.banew.cinema_server.backend.entities.CinemaUser;
+import com.banew.cinema_server.backend.entities.ViewSession;
 import com.banew.cinema_server.backend.repositories.BookingRepo;
 import com.banew.cinema_server.backend.repositories.CinemaUserRepo;
 
@@ -67,34 +68,41 @@ public class CinemaUserService {
     public LoginResponseDto processJwt(Jwt resultJwt) {
         String email = resultJwt.getClaim("email");
         CinemaUser cinemaUser = getUserByEmail(email).orElseGet(() -> {
-            Set<String> roles = new HashSet<>();
-            roles.add("USER");
-
-            if (userServiceProperties.getAdminEmails().contains(resultJwt.getClaim("email"))) {
-                roles.add("ADMIN");
-            }
-
             CinemaUser user = CinemaUser.builder()
             .email(resultJwt.getClaim("email"))
             .username(resultJwt.getClaim("name"))
             .photoSrc(resultJwt.getClaim("picture"))
-            .roles(roles)
             .build();
 
-            this.save(user);
             return user;
         });
 
+        updateRoles(cinemaUser);
         cinemaUser.setUsername(resultJwt.getClaim("name"));
         cinemaUser.setPhotoSrc(resultJwt.getClaim("picture"));
+        save(cinemaUser);
 
         return new LoginResponseDto(cinemaUser, jwtService.encodeJwt(cinemaUser));
     }
 
+    private void updateRoles(CinemaUser cinemaUser) {
+        Set<String> roles = new HashSet<>();
+        roles.add("USER");
+
+        if (userServiceProperties.getAdminEmails().contains(cinemaUser.getEmail())) {
+            roles.add("ADMIN");
+        }
+        if (userServiceProperties.getWorkerEmails().contains(cinemaUser.getEmail())) {
+            roles.add("WORKER");
+        }
+
+        cinemaUser.setRoles(roles);
+    }
+
     @Transactional
-    public List<ViewSessionInfoDto> getBookingSessionsByUser(CinemaUser cinemaUser) {
+    public List<ViewSession> getBookingSessionsByUser(CinemaUser cinemaUser) {
         return bookingRepo.findByCinemaUser(cinemaUser).stream()
-        .map(booking -> ViewSessionInfoDto.fromViewSession(booking.getViewSession()))
+        .map(booking -> booking.getViewSession())
         .distinct()
         .toList();
     }

@@ -13,4 +13,5 @@ import lombok.Setter;
 @Getter @Setter
 public class UserServiceProperties {
     private List<String> adminEmails;
+    private List<String> workerEmails;
 }

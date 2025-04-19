@@ -11,20 +11,20 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ViewSessionInfoDto {
+public class ViewSessionFullInfoDto {
     private Long id;
     private FilmSimpleInfoDto film;
     private LocalDateTime date;
     private String format;
     private Integer price_per_sit;
     private Hall hall_data;
-    private List<BookingOnlySitDto> bookings;
+    private List<BookingInfoDto> bookings;
 
-    public static ViewSessionInfoDto fromViewSession(ViewSession viewSession) {
+    public static ViewSessionFullInfoDto fromViewSession(ViewSession viewSession) {
         return builder()
         .id(viewSession.getId())
         .date(viewSession.getDate())
-        .bookings(viewSession.getBookings().stream().map(booking -> BookingOnlySitDto.fromBooking(booking)).toList())
+        .bookings(viewSession.getBookings().stream().map(booking -> BookingInfoDto.fromBooking(booking)).toList())
         .film(FilmSimpleInfoDto.fromFilm(viewSession.getFilm()))
         .format(viewSession.getFormat())
         .hall_data(viewSession.getHall_data())

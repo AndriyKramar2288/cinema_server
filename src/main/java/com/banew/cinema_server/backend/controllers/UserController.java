@@ -4,10 +4,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banew.cinema_server.backend.dto.CinemaUserInfoDto;
+import com.banew.cinema_server.backend.dto.ViewSessionFullInfoDto;
 import com.banew.cinema_server.backend.dto.ViewSessionInfoDto;
 import com.banew.cinema_server.backend.entities.CinemaUser;
 import com.banew.cinema_server.backend.services.CinemaUserService;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,10 @@ public class UserController {
     }
 
     @GetMapping("/session/")
-    public List<ViewSessionInfoDto> getUserBookingSessions(@AuthenticationPrincipal CinemaUser cinemaUser) {
-        return cinemaUserService.getBookingSessionsByUser(cinemaUser);
+    public List<ViewSessionFullInfoDto> getUserBookingSessions(@AuthenticationPrincipal CinemaUser cinemaUser) {
+        return cinemaUserService.getBookingSessionsByUser(cinemaUser).stream()
+        .sorted(Comparator.comparing(session -> session.getDate()))
+        .map(session -> ViewSessionFullInfoDto.fromViewSession(session))
+        .toList();
     }
 }

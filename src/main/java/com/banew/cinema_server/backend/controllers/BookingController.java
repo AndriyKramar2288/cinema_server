@@ -28,5 +28,4 @@ public class BookingController {
     public List<BookingInfoDto> saveBookings(@RequestBody @Valid List<BookingCreationDto> bookings) throws BadRequestSendedException {
         return bookingService.saveBookings(bookings);
     }
-    
 }

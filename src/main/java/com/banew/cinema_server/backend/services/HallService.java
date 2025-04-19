@@ -22,7 +22,7 @@ public class HallService {
         try {
             hallRepo.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new BadRequestSendedException("Видалення не вдалось: надто багато залежностей!");
+            throw new BadRequestSendedException("Видалення не вдалось: до цієї зали вже існують деякі сеанси!");
         }
     }
 

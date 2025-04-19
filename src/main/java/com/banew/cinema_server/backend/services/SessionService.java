@@ -41,7 +41,7 @@ public class SessionService {
         try {
             viewSessionRepo.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new BadRequestSendedException("Видалення не вдалось: надто багато залежностей!");
+            throw new BadRequestSendedException("Видалення не вдалось: до даного сеансу вже існують бронювання!");
         }
     }
 
@@ -65,6 +65,14 @@ public class SessionService {
         return getAll().stream()
             .filter(session -> session.getDate().isAfter(minTimeFilm))
             .filter(session -> session.getBookings().size() < session.getHall_data().getSize())
+            .toList();
+    }
+
+    public List<ViewSession> getFutureSessions() {
+        LocalDateTime now = LocalDateTime.now();
+
+        return getAll().stream()
+            .filter(session -> session.getDate().isAfter(now))
             .toList();
     }
 
