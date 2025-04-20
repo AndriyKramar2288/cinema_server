@@ -82,8 +82,11 @@ public class ParsingService {
     }
 
     private List<Document> parseDynamicUAKinoSearch(String request) {
-        WebDriverManager.chromedriver().setup();
-
+        WebDriverManager
+        .chromedriver()
+        .cachePath("/tmp/selenium-cache")
+        .setup();
+        
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
         options.setPageLoadStrategy(PageLoadStrategy.EAGER);
