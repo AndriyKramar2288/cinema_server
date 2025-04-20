@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.banew.cinema_server.backend.dto.CinemaUserInfoDto;
 import com.banew.cinema_server.backend.dto.ViewSessionFullInfoDto;
-import com.banew.cinema_server.backend.dto.ViewSessionInfoDto;
 import com.banew.cinema_server.backend.entities.CinemaUser;
 import com.banew.cinema_server.backend.services.CinemaUserService;
 

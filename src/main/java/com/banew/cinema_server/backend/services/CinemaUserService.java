@@ -1,6 +1,5 @@
 package com.banew.cinema_server.backend.services;
 
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.banew.cinema_server.backend.dto.LoginResponseDto;
-import com.banew.cinema_server.backend.dto.ViewSessionFullInfoDto;
 import com.banew.cinema_server.backend.entities.CinemaUser;
 import com.banew.cinema_server.backend.entities.ViewSession;
 import com.banew.cinema_server.backend.repositories.BookingRepo;

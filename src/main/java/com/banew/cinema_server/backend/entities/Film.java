@@ -31,7 +31,7 @@ public class Film {
     private List<String> src_photos;
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Actor> actors;
-    private String duration;
+    private Long duration;
     private String voice_acting;
     @ElementCollection
     private List<Rate> rating;

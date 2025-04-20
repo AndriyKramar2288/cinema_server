@@ -28,7 +28,7 @@ public class FilmServiceTest {
         .age_limit("")
         .countries(List.of("aboba"))
         .director("aboba")
-        .duration("aboba")
+        .duration(14555L)
         .en_name("aboba")
         .genres(List.of("aboba"))
         .imdb("aboba")

@@ -6,6 +6,7 @@ import com.banew.cinema_server.backend.entities.Actor;
 import com.banew.cinema_server.backend.entities.Film;
 import com.banew.cinema_server.backend.entities.Rate;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -37,8 +38,9 @@ public class FilmSimpleInfoDto {
     private List<String> src_photos;
     @NotNull
     private List<String> actors;
-    @NotBlank
-    private String duration;
+    @NotNull
+    @Min(value = 0)
+    private Long duration;
     @NotNull
     private String voice_acting;
     @NotBlank

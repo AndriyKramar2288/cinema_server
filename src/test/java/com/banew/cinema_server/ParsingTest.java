@@ -14,6 +14,6 @@ public class ParsingTest {
 
     @Test
     public void checkTest() throws Exception {
-        System.out.println(parsingService.findFilmsByUAKino("Нікчемний я"));
+        System.out.println(parsingService.findFilmsByUAKino("Месники").size());
     }
 }

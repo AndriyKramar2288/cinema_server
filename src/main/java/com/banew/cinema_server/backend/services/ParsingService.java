@@ -1,13 +1,13 @@
 package com.banew.cinema_server.backend.services;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,16 +21,67 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.banew.cinema_server.backend.dto.FilmSimpleInfoDto;
 import com.banew.cinema_server.backend.exceptions.BadRequestSendedException;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import jakarta.validation.Validator;
 
 @Service
 public class ParsingService {
-    private Document parseDynamicUAKinoSearch(String request) {
+    @Autowired
+    Validator validator;
+
+    private Long parseDurationToMinutes(String input) {
+        if (input == null || input.isBlank()) return 0L;
+    
+        input = input.toLowerCase().trim();
+    
+        long minutes = 0;
+    
+        try {
+            // 👇 Парсимо формат типу 01:44
+            Pattern timePattern = Pattern.compile("(\\d{1,2}):(\\d{2})");
+            Matcher timeMatcher = timePattern.matcher(input);
+            if (timeMatcher.find()) {
+                int hours = Integer.parseInt(timeMatcher.group(1));
+                int mins = Integer.parseInt(timeMatcher.group(2));
+                return (long) hours * 60 + mins;
+            }
+    
+            // 👇 Парсимо формат з "год" / "хв"
+            Pattern hrMinPattern = Pattern.compile("(\\d+)\\s*год");
+            Matcher hrMatcher = hrMinPattern.matcher(input);
+            if (hrMatcher.find()) {
+                minutes += Integer.parseInt(hrMatcher.group(1)) * 60;
+            }
+    
+            Pattern minPattern = Pattern.compile("(\\d+)\\s*(хв|хвилин|хвилини)");
+            Matcher minMatcher = minPattern.matcher(input);
+            while (minMatcher.find()) {
+                minutes += Integer.parseInt(minMatcher.group(1));
+            }
+    
+            // 👇 Якщо просто одне число: "104" — можливо це хвилини
+            if (minutes == 0) {
+                Pattern singleNumber = Pattern.compile("(\\d+)");
+                Matcher m = singleNumber.matcher(input);
+                if (m.find()) {
+                    return Long.parseLong(m.group(1));
+                }
+            }
+    
+        } catch (Exception e) {
+            e.printStackTrace(); // або лог, або повертай null
+        }
+    
+        return minutes;
+    }
+
+    private List<Document> parseDynamicUAKinoSearch(String request) {
         WebDriverManager.chromedriver().setup();
 
         ChromeOptions options = new ChromeOptions();
@@ -40,7 +91,7 @@ public class ParsingService {
         WebDriver driver = new ChromeDriver(options);
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(1));
 
-        Document html = null;
+        List<Document> documents = new ArrayList<>();
 
         try {
             driver.get("https://uakino.me/index.php?do=search");
@@ -51,15 +102,24 @@ public class ParsingService {
             
             searchInput.sendKeys(request);
             searchInput.submit();
-            
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.className("movie-item")));
 
-            html = Jsoup.parse(driver.getPageSource());
+            while (true) {
+                wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy((By.className("movie-item"))));
+                documents.add(Jsoup.parse(driver.getPageSource()));
+                if (driver.findElements(By.cssSelector(".pnext a")).size() > 0) {
+                    WebElement nextButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".pnext a")));
+                    nextButton.click();
+                }
+                else {
+                    break;
+                }
+            }
+
         } catch (Exception e) { }
         finally {
             driver.quit();
         }
-        return html;
+        return documents;
     }
 
     private FilmSimpleInfoDto generateFilmInfoByFilmPage(Document filmPage) {
@@ -143,7 +203,7 @@ public class ParsingService {
             
             // Extract duration
             String duration = filmPage.select("div.fi-item:contains(Тривалість) div.fi-desc").text();
-            film.setDuration(duration);
+            film.setDuration(parseDurationToMinutes(duration));
             
             // Extract voice acting
             String voiceActing = filmPage.select("div.fi-item:contains(Мова озвучення) div.fi-desc").text();
@@ -178,25 +238,31 @@ public class ParsingService {
     public Set<FilmSimpleInfoDto> findFilmsByUAKino(String request) throws BadRequestSendedException {
         Set<FilmSimpleInfoDto> result = new HashSet<>();
 
-        Document siteWithFilmList = parseDynamicUAKinoSearch(request);
+        List<Document> sitesWithFilmList = parseDynamicUAKinoSearch(request);
 
-        if (siteWithFilmList == null) {
-            throw new BadRequestSendedException("Помилка парсингу!");
-        }
-
-        Elements films_cards = siteWithFilmList.getElementsByClass("movie-item");
-        for (Element card : films_cards) {
-            try {
-                Element link = card.getElementsByTag("a").first();
-                Document filmPage = Jsoup.connect(link.attr("href")).get();
-                
-                if (filmPage.getElementsByClass("solototle").size() != 1) {
-                    continue;
-                }
-                result.add(generateFilmInfoByFilmPage(filmPage));
-
-            } catch (IOException e) {
+        for (Document siteWithFilmList : sitesWithFilmList) {
+            if (siteWithFilmList == null) {
                 throw new BadRequestSendedException("Помилка парсингу!");
+            }
+    
+            Elements films_cards = siteWithFilmList.getElementsByClass("movie-item");
+            for (Element card : films_cards) {
+                try {
+                    Element link = card.getElementsByTag("a").first();
+                    Document filmPage = Jsoup.connect(link.attr("href")).get();
+                    
+                    if (filmPage.getElementsByClass("solototle").size() != 1) {
+                        continue;
+                    }
+
+                    FilmSimpleInfoDto gettedFilm = generateFilmInfoByFilmPage(filmPage);
+                    var violations = validator.validate(gettedFilm);
+                    if (violations.size() < 4) {
+                        result.add(gettedFilm);
+                    }
+                } catch (IOException e) {
+                    throw new BadRequestSendedException("Помилка парсингу!");
+                }
             }
         }
 

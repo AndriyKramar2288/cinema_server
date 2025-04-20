@@ -94,8 +94,8 @@ public class SessionService {
                 continue;
             }
 
-            if (eachSession.getDate().plusMinutes(Long.parseLong(eachSession.getFilm().getDuration() + PREPARE_TIME)).isBefore(session.getDate()) ||
-                session.getDate().plusMinutes(Long.parseLong(film.getDuration() + PREPARE_TIME)).isBefore(eachSession.getDate())) {
+            if (eachSession.getDate().plusMinutes(eachSession.getFilm().getDuration() + PREPARE_TIME).isBefore(session.getDate()) ||
+                session.getDate().plusMinutes(film.getDuration() + PREPARE_TIME).isBefore(eachSession.getDate())) {
                     continue;
             }
 
