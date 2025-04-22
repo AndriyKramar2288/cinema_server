@@ -35,6 +35,8 @@ public class ParsingService {
     @Autowired
     Validator validator;
 
+    private final Long PARSING_VALIDATION_MAX_VIOLATIONS = 6L;
+
     private Long parseDurationToMinutes(String input) {
         if (input == null || input.isBlank()) return 0L;
     
@@ -260,7 +262,7 @@ public class ParsingService {
 
                     FilmSimpleInfoDto gettedFilm = generateFilmInfoByFilmPage(filmPage);
                     var violations = validator.validate(gettedFilm);
-                    if (violations.size() < 4) {
+                    if (violations.size() <= PARSING_VALIDATION_MAX_VIOLATIONS) {
                         result.add(gettedFilm);
                     }
                 } catch (IOException e) {

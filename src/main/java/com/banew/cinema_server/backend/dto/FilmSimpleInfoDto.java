@@ -9,6 +9,7 @@ import com.banew.cinema_server.backend.entities.Rate;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,16 +28,20 @@ public class FilmSimpleInfoDto {
     @NotNull
     private Long release_year;
     @NotNull
+    @Size(min = 1)
     private List<String> countries;
     @NotNull
+    @Size(min = 1)
     private List<String> genres;
     @NotBlank
     private String director;
     @NotBlank
     private String src_poster;
     @NotNull
+    @Size(min = 1)
     private List<String> src_photos;
     @NotNull
+    @Size(min = 1)
     private List<String> actors;
     @NotNull
     @Min(value = 0)
