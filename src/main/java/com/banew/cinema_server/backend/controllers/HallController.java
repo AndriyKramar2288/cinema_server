@@ -2,7 +2,6 @@ package com.banew.cinema_server.backend.controllers;
 
 import java.util.List;
 
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,7 @@ public class HallController {
     @PostMapping("/")
     @ResponseStatus(code = HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public Hall createHall(@RequestBody @Valid Hall hall)  throws BadRequestException {
+    public Hall createHall(@RequestBody @Valid Hall hall) throws BadRequestSendedException {
         return hallService.saveHall(hall);
     }
 

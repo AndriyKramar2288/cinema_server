@@ -26,7 +26,10 @@ public class HallService {
         }
     }
 
-    public Hall saveHall(Hall hall) {
+    public Hall saveHall(Hall hall) throws BadRequestSendedException {
+        if (!hall.getSize().equals(16L)) {
+            throw new BadRequestSendedException("Наразі додавання зали з розміром, відмінним від 16, неможливе!");
+        }
         hallRepo.save(hall);
         return hall;
     }

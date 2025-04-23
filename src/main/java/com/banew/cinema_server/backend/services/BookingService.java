@@ -71,6 +71,9 @@ public class BookingService {
         if (viewSession.getBookings().stream().map(b -> b.getSit()).toList().contains(dto.getSit())) {
             throw new BadRequestSendedException("Місце під номером " + dto.getSit() + " вже забронювали!");
         }
+        if (dto.getSit() > viewSession.getHall_data().getSize() || dto.getSit() < 1) {
+            throw new BadRequestSendedException("Місце під номером " + dto.getSit() + " неможливе для бронювання в даній залі!");
+        }
     }
 
     private void checkUnique(List<BookingCreationDto> bookingDtos) throws BadRequestSendedException {

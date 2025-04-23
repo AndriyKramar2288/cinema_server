@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,9 +50,11 @@ public class SessionController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/available")
-    public List<ViewSessionInfoDto> getAvailableSessions() {
+    @Transactional
+    @GetMapping("/available/by_film/{film_id}")
+    public List<ViewSessionInfoDto> getAvailableSessions(@PathVariable Long film_id) {
         return sessionService.getAvailableSessions().stream()
+        .filter(session -> session.getFilm().getId().equals(film_id))
         .map(session -> ViewSessionInfoDto.fromViewSession(session))
         .toList();
     }
