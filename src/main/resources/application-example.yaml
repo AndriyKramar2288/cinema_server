@@ -1,0 +1,65 @@
+spring:
+    application:
+        name: cinema_server
+    profiles:
+        active: dev
+
+secret.decoder_key: # your_256_bit_secret_key_here_min_32_chars | Мінімум 32 символи для HMAC256
+token_lifetime: 7
+
+google:
+    issure_uri: https://accounts.google.com
+    client_id: # your_google_client_id_here | Google OAuth Client ID
+
+usr-service:
+    adminEmails:
+        - # admin@example.com | Email адреси адміністраторів
+    workerEmails:
+        - # worker@example.com | Email адреси працівників
+
+server:
+  servlet:
+    context-path: /api
+
+#logging.level.org.springframework.security: DEBUG
+---
+
+spring:
+    config:
+        activate:
+            on-profile: dev
+    datasource:
+        username: # your postgres user
+        password: # your postgres password
+        url: # db-url, that looks like 'jdbc:postgresql://<your database host>:<database port>/<database name>'
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+
+---
+
+server:
+  address: 0.0.0.0
+
+spring:
+    config:
+        activate:
+            on-profile: prod
+    datasource:
+        username: postgres
+        password: # your postgres password
+        url: jdbc:postgresql://db/cinema_db
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
+

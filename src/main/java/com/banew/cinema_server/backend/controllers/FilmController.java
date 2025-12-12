@@ -53,7 +53,7 @@ public class FilmController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity delFilmById(@PathVariable Long id) throws BadRequestSendedException {
+    public ResponseEntity<Void> delFilmById(@PathVariable Long id) throws BadRequestSendedException {
         filmService.deleteFilmById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
